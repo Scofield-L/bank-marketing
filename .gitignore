@@ -1,0 +1,28 @@
+# ===== 数据集（大文件不入库，另存云盘） =====
+# data/ 目录只保留 README.md，其他文件一律忽略
+data/*
+!data/README.md
+
+# ===== 大型二进制交付物（不入库，另存云盘） =====
+*.mp4
+*.zip
+*.rar
+*.7z
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.so
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.env
+*.egg-info/
+build/
+dist/
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+desktop.ini
