@@ -3,3 +3,9 @@ scipy==1.13.1
 pandas==2.2.3
 scikit-learn==1.5.2
 imbalanced-learn==0.12.4
+
+# B/C 建模与可视化依赖（版本待 B/C 验证后固定）
+matplotlib
+seaborn
+xgboost
+lightgbm
