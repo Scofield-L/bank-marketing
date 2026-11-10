@@ -44,8 +44,25 @@ def split_data(frame, seed=42, test_size=0.2, include_duration=False):
     return train_test_split(X, y, test_size=test_size, random_state=seed, stratify=y)
 
 
-def make_preprocessor(include_duration=False, scale=True):
-    numeric = [c for c in NUMERIC if include_duration or c != 'duration']
+def _feature_columns(include_duration=False, drop_features=None):
+    if isinstance(drop_features, str):
+        raise ValueError('drop_features 应为字段名列表，不能是字符串')
+    dropped = set(drop_features or [])
+    unknown = dropped - set(NUMERIC + CATEGORICAL)
+    if unknown:
+        raise ValueError(f'未知的 drop_features 字段：{sorted(unknown)}')
+    if not include_duration:
+        dropped.add('duration')
+    numeric = [c for c in NUMERIC if c not in dropped]
+    categorical = [c for c in CATEGORICAL if c not in dropped]
+    if not numeric and not categorical:
+        raise ValueError('不能排除所有输入字段')
+    return numeric, categorical
+
+
+def make_preprocessor(include_duration=False, scale=True, drop_features=None):
+    """排除指定数值/类别字段；drop_features 优先于 include_duration。"""
+    numeric, categorical = _feature_columns(include_duration, drop_features)
     steps = [('impute', SimpleImputer(strategy='median', keep_empty_features=True))]
     if scale:
         steps.append(('scale', StandardScaler()))
@@ -54,22 +71,24 @@ def make_preprocessor(include_duration=False, scale=True):
         ('categorical', Pipeline([
             ('impute', SimpleImputer(strategy='constant', fill_value='missing', keep_empty_features=True)),
             ('encode', OneHotEncoder(handle_unknown='ignore', sparse_output=False)),
-        ]), CATEGORICAL),
+        ]), categorical),
     ], verbose_feature_names_out=True)
 
 
-def make_model_pipeline(estimator, strategy='none', include_duration=False, scale=True, seed=42):
+def make_model_pipeline(estimator, strategy='none', include_duration=False, scale=True, seed=42,
+                        drop_features=None):
     """strategy: none / class_weight / undersample / smote (= SMOTENC)。
 
     传原始 X 给 GridSearchCV；禁止使用导出的矩阵做交叉验证。
     SMOTENC 在填补、数值缩放之后、One-Hot 之前运行，保留离散类别。
+    drop_features 同时排除数值与类别字段；输入表可保留或提前删除这些列。
     """
     from sklearn.base import clone
     from imblearn.pipeline import Pipeline as SamplingPipeline
     from imblearn.over_sampling import SMOTENC
     from imblearn.under_sampling import RandomUnderSampler
     estimator = clone(estimator)
-    preprocessor = make_preprocessor(include_duration, scale)
+    preprocessor = make_preprocessor(include_duration, scale, drop_features)
     if strategy == 'class_weight':
         if 'class_weight' not in estimator.get_params():
             raise ValueError('该模型不支持 class_weight，请由 B 配置专用权重参数')
@@ -81,13 +100,15 @@ def make_model_pipeline(estimator, strategy='none', include_duration=False, scal
                                  ('sample', RandomUnderSampler(random_state=seed)), ('model', estimator)])
     if strategy != 'smote':
         raise ValueError(f'未知采样策略：{strategy}')
-    numeric = [c for c in NUMERIC if include_duration or c != 'duration']
+    numeric, categorical = _feature_columns(include_duration, drop_features)
+    if not numeric or not categorical:
+        raise ValueError('smote 使用 SMOTENC，需要同时保留数值字段和类别字段')
     # 数值管线复用；类别暂不编码，以便 SMOTENC 识别类别。
     before = ColumnTransformer([
         ('numeric', preprocessor.transformers[0][1], numeric),
-        ('categorical', SimpleImputer(strategy='constant', fill_value='missing', keep_empty_features=True), CATEGORICAL),
+        ('categorical', SimpleImputer(strategy='constant', fill_value='missing', keep_empty_features=True), categorical),
     ])
-    cat_indices = list(range(len(numeric), len(numeric) + len(CATEGORICAL)))
+    cat_indices = list(range(len(numeric), len(numeric) + len(categorical)))
     after = ColumnTransformer([
         ('numeric', 'passthrough', list(range(len(numeric)))),
         ('categorical', OneHotEncoder(handle_unknown='ignore', sparse_output=False), cat_indices),
