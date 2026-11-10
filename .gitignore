@@ -3,6 +3,10 @@
 data/*
 !data/README.md
 
+# ===== 本地 IDE 和开发工具 =====
+/.idea/
+/.codeartsdoer/
+
 # ===== 大型二进制交付物（不入库，另存云盘） =====
 *.mp4
 *.zip
