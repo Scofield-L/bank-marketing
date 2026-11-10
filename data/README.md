@@ -1,44 +1,17 @@
 # data/ 目录说明
 
-本目录用于存放数据集，但**数据文件本身不纳入 Git 版本管理**（见根目录 `.gitignore`），请从以下地址下载后放入本目录。
+默认使用 UCI bank-full.csv：45,211 行、16 个输入字段和目标 y；分号分隔。原始文件及产物被 Git 忽略。
 
-## 下载地址
+来源：https://archive.ics.uci.edu/dataset/222/bank+marketing
 
-**UCI Bank Marketing Data Set**
+下载：https://archive.ics.uci.edu/ml/machine-learning-databases/00222/bank.zip
 
-- 数据集主页：https://archive.ics.uci.edu/ml/datasets/bank+marketing
-- 完整版数据（含额外特征，约 41,188 条）：
-  `https://archive.ics.uci.edu/ml/machine-learning-databases/00222/bank-additional.zip`
-- 精简版数据（约 45,211 条，20 个特征）：
-  `https://archive.ics.uci.edu/ml/machine-learning-databases/00222/bank.zip`
+运行 `python code/00_download_data.py` 下载 bank-full.csv、bank-names.txt，记录来源与校验值；拒绝覆盖已有文件。也可手动下载并将这两个文件放在本目录。
 
-> 说明：`bank.zip`（bank-full.csv）为精简版，行数更多（45,211 条），满足 ≥5000 条要求；`bank-additional.zip`（bank-additional-full.csv）特征更丰富。二选一即可，建议先用 `bank-full.csv`。
+bank.csv 为 4,521 行抽样，不满足课程规模要求；bank-additional-full.csv 为 41,188 行、20 个输入字段的不同版本。本项目拒绝混用结构。
 
-## 下载后放置方式
+bank-full 的 pdays=-1 表示此前未联系；additional 使用 999，不能套用。
 
-```
-data/
-├── README.md          # 本文件（已入库）
-└── bank-full.csv      # 下载后放这里（不入库，已被 .gitignore 忽略）
-```
+运行 `python code/01_preprocessing.py` 生成 processed/train.csv、test.csv、matrices.npz、preprocessor.joblib 和 manifest.json。默认排除 duration，分层 80/20、seed=42，原始文件保持不变。
 
-## 字段说明（主要）
-
-| 字段 | 含义 |
-|------|------|
-| age | 年龄 |
-| job | 职业 |
-| marital | 婚姻状况 |
-| education | 教育程度 |
-| default | 是否有信用违约 |
-| balance | 年均余额 |
-| housing | 是否有住房贷款 |
-| loan | 是否有个人贷款 |
-| contact | 联系方式 |
-| day / month | 最后联系日期 |
-| duration | 最后联系通话时长（秒） |
-| campaign | 本次营销联系次数 |
-| pdays | 距上次联系的天数（999 表示从未联系） |
-| previous | 本次营销前的联系次数 |
-| poutcome | 上次营销结果 |
-| y | **目标变量**：是否订阅定期存款（yes/no） |
+详见 [数据说明](../docs/A/数据说明.md)、[交接记录](../docs/A/交接与复现记录.md)。
