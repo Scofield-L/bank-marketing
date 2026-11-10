@@ -54,5 +54,33 @@ class PreprocessingTests(unittest.TestCase):
                 self.assertTrue(np.isfinite(scores).all())
 
 
+    def test_drop_features_for_preprocessor(self):
+        a, b, _, _ = split_data(self.frame)
+        dropped = ['campaign', 'day', 'month']
+        processor = make_preprocessor(drop_features=dropped)
+        matrix = processor.fit_transform(a)
+        names = processor.get_feature_names_out()
+        self.assertFalse(any(name.split('__', 1)[1].split('_', 1)[0] in dropped for name in names))
+        np.testing.assert_array_equal(matrix, processor.transform(a.drop(columns=dropped)))
+        self.assertEqual(processor.transform(b.drop(columns=dropped)).shape[1], matrix.shape[1])
+        explicit = make_preprocessor(include_duration=True, drop_features=['duration'])
+        self.assertNotIn('duration', explicit.transformers[0][2])
+        with self.assertRaisesRegex(ValueError, '未知'):
+            make_preprocessor(drop_features=['compaign'])
+
+    def test_drop_features_for_all_sampling_pipelines(self):
+        a, _, ya, _ = split_data(self.frame)
+        ids = ya.groupby(ya).head(120).index
+        dropped = ['campaign', 'day', 'month']
+        for strategy in ['none', 'class_weight', 'undersample', 'smote']:
+            with self.subTest(strategy=strategy):
+                pipeline = make_model_pipeline(LogisticRegression(max_iter=1000), strategy,
+                                               drop_features=dropped)
+                scores = cross_val_score(pipeline, a.loc[ids].drop(columns=dropped), ya.loc[ids],
+                                         cv=StratifiedKFold(2, shuffle=True, random_state=42),
+                                         scoring='roc_auc', error_score='raise')
+                self.assertTrue(np.isfinite(scores).all())
+
+
 if __name__ == '__main__':
     unittest.main()
