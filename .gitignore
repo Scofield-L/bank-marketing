@@ -1,7 +1,10 @@
 # ===== 数据集（大文件不入库，另存云盘） =====
-# data/ 目录只保留 README.md，其他文件一律忽略
+# data/ 目录：原始数据与处理矩阵不入库；建模/EDA 结果表（小 CSV）入库
 data/*
 !data/README.md
+!data/modeling/
+!data/eda/
+data/modeling/models/
 
 # ===== 本地 IDE 和开发工具 =====
 /.idea/
