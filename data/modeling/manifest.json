@@ -1,0 +1,29 @@
+{
+  "data_sha256": "d1513ec63b385506f7cfce9f2c5caa9fe99e7ba4e8c3fa264b3aaf0f849ed32d",
+  "split_sha256": {
+    "train": "149bbb1b53cffaa75a1a78a0c0b79601ba32c16bda1aded3351674f27328bc3f",
+    "test": "76511bcf08a9b6093ec603fd03ae6f58848c1b4b5c23735619f6c060ba1f6379"
+  },
+  "train_rows": 36168,
+  "test_rows": 9043,
+  "test_size": 0.2,
+  "seed": 42,
+  "cv_folds": 5,
+  "selection_metric": "average_precision",
+  "selection_tie_breaker": "roc_auc",
+  "positive_label": 1,
+  "threshold": 0.5,
+  "recommended": "xgb_none_tuned",
+  "initial_winner": "xgb_none",
+  "tuned": "xgb_none_tuned",
+  "duration_control": "duration_control",
+  "recommended_oof": "recommended_oof.csv",
+  "versions": {
+    "numpy": "1.26.4",
+    "pandas": "2.2.3",
+    "sklearn": "1.5.2",
+    "imblearn": "0.12.4",
+    "xgboost": "2.1.4",
+    "joblib": "1.6.0"
+  }
+}

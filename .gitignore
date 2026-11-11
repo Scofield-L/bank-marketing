@@ -1,10 +1,26 @@
 # ===== 数据集（大文件不入库，另存云盘） =====
-# data/ 目录：原始数据与处理矩阵不入库；建模/EDA 结果表（小 CSV）入库
-data/*
-!data/README.md
-!data/modeling/
-!data/eda/
-data/modeling/models/
+/data/*
+!/data/README.md
+
+!/data/eda/
+/data/eda/*
+!/data/eda/*.csv
+
+!/data/modeling/
+/data/modeling/*
+!/data/modeling/manifest.json
+!/data/modeling/cv_summary.csv
+!/data/modeling/cv_candidates.csv
+!/data/modeling/recommended_oof.csv
+
+!/data/modeling/predictions/
+/data/modeling/predictions/*
+!/data/modeling/predictions/*.csv
+
+!/data/modeling/importance/
+/data/modeling/importance/*
+!/data/modeling/importance/*.csv
+
 
 # ===== 本地 IDE 和开发工具 =====
 /.idea/
