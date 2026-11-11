@@ -1,4 +1,4 @@
-# ===== 数据与 B 的交付产物 =====
+# ===== 数据集（大文件不入库，另存云盘） =====
 /data/*
 !/data/README.md
 
@@ -20,6 +20,7 @@
 !/data/modeling/importance/
 /data/modeling/importance/*
 !/data/modeling/importance/*.csv
+
 
 # ===== 本地 IDE 和开发工具 =====
 /.idea/
