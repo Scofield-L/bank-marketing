@@ -4,5 +4,10 @@ pandas==2.2.3
 scikit-learn==1.5.2
 imbalanced-learn==0.12.4
 
+# B 建模与可视化依赖
 matplotlib==3.10.0
 xgboost==2.1.4
+
+# C 建模与可视化依赖（版本待 C 验证后固定）
+seaborn
+lightgbm
