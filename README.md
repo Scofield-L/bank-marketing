@@ -58,4 +58,16 @@ python -m venv .venv
 
 B 调参应使用原始 train.csv 和 code/bank_preprocessing.py 的 Pipeline 接口，保证预处理和采样在训练折内完成。详见 [A 交接与复现记录](docs/A/交接与复现记录.md)、[数据说明](docs/A/数据说明.md) 和 [预处理说明](docs/A/数据预处理说明.md)。
 
-当前完成 A 的数据流程初版；02_eda.py、03_modeling.py、04_evaluation.py 尚待 B/C 交付，完整项目端到端复现尚未完成。
+## B 的实验与 A 的交接核验
+
+已整合 B 的 EDA、建模与调参代码。主实验为已安排电话的拨号前评分，假设 day/month、contact、campaign 已知，仅排除 duration。推荐 xgb_none_tuned，保留原始分布和 pdays=-1；duration_control 为独立通话后对照。
+
+```powershell
+.\.venv\Scripts\python code/02_eda.py
+.\.venv\Scripts\python code/03_modeling.py --jobs 4
+.\.venv\Scripts\python code/05_verify_handoff.py --refit
+```
+
+建模命令会重跑完整五折比较和网格调参，并写入 data/modeling/；仅核对已交付结果时直接运行 05_verify_handoff.py 即可，不加 --refit 不重训。核验报告在 data/integration/handoff_check.json，模型二进制按仓库规则不入库。B 的结果表已入库，原始 CSV 和 processed/ 仍需本地准备。
+
+完整接口见 [B 的交接文档](docs/B/建模与评估交接.md)。C 的 04_evaluation.py 尚待交付，完整项目端到端复现尚未完成。
