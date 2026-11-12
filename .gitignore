@@ -21,6 +21,11 @@
 /data/modeling/importance/*
 !/data/modeling/importance/*.csv
 
+!/data/evaluation/
+/data/evaluation/*
+!/data/evaluation/*.csv
+!/data/evaluation/*.json
+
 
 # ===== 本地 IDE 和开发工具 =====
 /.idea/
